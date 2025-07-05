@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    function parseAndRedirect() {
+      const params = new URLSearchParams(window.location.search);
+      const rawUrl = params.get("url");
+
+      if (!rawUrl) {
+        document.body.innerText = 'Missing "url" parameter.';
+        return;
+      }
+
+      // Try parsing manually if it's not http(s) to avoid URL constructor failure
+      try {
+        const urlParts = rawUrl.split("?");
+        const base = urlParts[0];
+        const search = urlParts[1] || "";
+
+        const query = new URLSearchParams(search);
+        const sorted = new URLSearchParams();
+        for (const key of [...query.keys()].sort()) {
+          sorted.set(key, query.get(key));
+        }
+
+        const finalUrl = base + (sorted.toString() ? "?" + sorted.toString() : "");
+
+        // For schemes like upi://, mailto:, etc.
+        window.location.href = finalUrl;
+      } catch (e) {
+        document.body.innerText = "Error: " + e;
+      }
+    }
+  </script>
+</head>
+<body onload="parseAndRedirect()">
+  Redirecting...
+</body>
+</html>
